@@ -1,23 +1,43 @@
 package be.vdab.domain.item;
 
 import javax.persistence.*;
-import java.util.Objects;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 @DiscriminatorValue("GAME")
+//TRAINER TODO: als je uniqueConstraints wil gebruiken op title en ook de title column hebben in Game table kan je AttributeOverride gebruiken om deze van de parent te overiden
+@AttributeOverride(column = @Column(name = "title", length = 100, nullable = false), name = "gameTitle")
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"publisher", "title"}))
 public class Game extends Item {
 
+    @NotBlank
+    @Size(max = 100)
     private String publisher;
+
     private int minimumAge;
+
+    @Size(max = 100)
+    private String gameTitle; //TRAINER TODO: gebruik hier best een andere naam voor title (omdat title ook in Item wordt gebruikt), anders krijg je fout meldingen
+
+    @Enumerated(EnumType.ORDINAL) //TRAINER TODO: waarom ordinal en geen string?
     private Genre genre;
 
-    public Game() { }
-
-    public Game(Long id, String title, double price, String supplierId, String publisher, int minimumAge, Genre genre) {
-        super(id, title, price, supplierId);
+    public Game(String gameTitle, double price, String supplierId, int inventory, String publisher) {
+        super(gameTitle, price, supplierId, inventory);
         this.publisher = publisher;
-        this.minimumAge = minimumAge;
-        this.genre = genre;
+    }
+
+    public String getGameTitle() {
+        return gameTitle;
+    }
+
+    public void setGameTitle(String title) {
+        this.gameTitle = title;
+    }
+
+    public Game() {
+
     }
 
     public String getPublisher() {
@@ -40,27 +60,12 @@ public class Game extends Item {
         return genre;
     }
 
-    @Enumerated(EnumType.ORDINAL)
     public void setGenre(Genre genre) {
         this.genre = genre;
     }
 
     public enum Genre {
-        MMORPG, RPG, FPS, RTS, RACE;
+        MMORPG, RPG, FPS, RTS, RACE
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Game game = (Game) o;
-        return minimumAge == game.minimumAge &&
-                Objects.equals(publisher, game.publisher) &&
-                genre == game.genre;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(publisher, minimumAge, genre);
-    }
 }

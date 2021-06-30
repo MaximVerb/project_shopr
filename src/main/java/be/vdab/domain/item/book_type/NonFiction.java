@@ -9,33 +9,25 @@ import java.util.Objects;
 @DiscriminatorValue("NON_FICTION")
 public class NonFiction extends Book {
 
-    public NonFiction() { }
-
-    public NonFiction(Long id, String title, double price, String supplierId, String author,
-                      String isbn, int pages, Subject subject) {
-        super(id, title, price, supplierId, author, isbn, pages);
-        this.subject = subject;
-    }
-
+    @Enumerated(EnumType.ORDINAL)
     private Subject subject;
 
-    @Enumerated(EnumType.ORDINAL)
+    public NonFiction(String title, double price, String supplierId, int inventory, String isbn) {
+        super(title, price, supplierId, inventory, isbn);
+    }
+
+    public NonFiction() {
+
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
     public void setSubject(Subject subject) { this.subject = subject;}
 
     public enum Subject {
-        HISTORY, COOKBOOK, SCIENCE, SPORT;
+        HISTORY, COOKBOOK, SCIENCE, SPORT
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        NonFiction that = (NonFiction) o;
-        return subject == that.subject;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(subject);
-    }
 }
